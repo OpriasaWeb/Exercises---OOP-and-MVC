@@ -28,14 +28,14 @@ class Database{
   }
 
   // Insert define method
-  public function insertAcc($name, $status){
+  public function insertAcc($fullname, $stat){
 
     $sql = "INSERT INTO account (name, status) VALUES (:name, :status);";
     
     $statement = $this->conn->prepare($sql);  
 
-    $statement->bindparam(":name", $name, PDO::PARAM_STR); // PDO::PARAM_STR - represents the SQL CHAR, VARCHAR, or other string data type.
-    $statement->bindparam(":status", $status);
+    $statement->bindparam("name", $fullname, PDO::PARAM_STR); // PDO::PARAM_STR - represents the SQL CHAR, VARCHAR, or other string data type.
+    $statement->bindparam("status", $stat);
 
     $statement->execute();
     
@@ -57,14 +57,15 @@ class Database{
   // Insert define method
 
   // Insert to account details
-  public function insertAccDetails($id, $address, $gender){
+  public function insertAccDetails($id, $full_address, $gender){
     $sql = "INSERT INTO accountdetails (account_id, address, gender) VALUES (:account_id, :address, :gender)";
 
     $statement = $this->conn->prepare($sql);
 
-    $statement->bindparam(":account_id", $id, PDO::PARAM_STR);
-    $statement->bindparam(":address", $address, PDO::PARAM_STR);
-    $statement->bindparam(":gender", $gender, PDO::PARAM_STR);
+    $statement->bindparam(":account_id", $id);
+    $statement->bindparam(":address", $full_address);
+    $statement->bindparam(":gender", $gender);
+    // PDO::PARAM_STR
     
     $statement->execute();
     return true;
@@ -73,9 +74,9 @@ class Database{
 
 
   // Read define method
-  public function read(){
+  public function view_info(){
     $data = array();
-    $sql = "SELECT a.name, a.status, ad.address FROM account a LEFT JOIN accountdetails ad ON a.id = ad.account_id";
+    $sql = "SELECT a.name, ad.address, a.status FROM account a LEFT JOIN accountdetails ad ON a.id = ad.account_id";
     $statement = $this->conn->prepare($sql);
     $statement->execute();
     $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -84,7 +85,7 @@ class Database{
     }
     return $data;
   }
-  // Read define method
+  // Read define method 
 
 
   // Get user ID

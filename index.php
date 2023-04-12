@@ -16,42 +16,8 @@ function test_input($data) {
   return $data;
 }
 
-// if($_SERVER['REQUEST_METHOD'] == 'POST'){
-//   // It sanitize data from html input with htmlspecialchars
-//   $lname = $_POST['lastname'];
-//   $fname = $_POST['firstname'];
 
-//   // $island = $_POST['island'];
-//   $region = $_POST['region'];
-//   $province = $_POST['province'];
-//   $city = $_POST['city'];
-//   $barangay = $_POST['brgy'];
 
-//   $name = $fname . " " . $lname;
-//   $status = $_POST['status'];
-
-//   $accId = $_POST['accId'];
-//   $address = $island . ", " . $region . ", " . $province . ", " . $city . ", " . $barangay;
-//   $gender = $_POST['gender'];
-  
-
-//   // Sanitize the data before inserting it into the database
-
-//   $userAddress = filter_var($address, FILTER_SANITIZE_STRING);
-//   $userGender = filter_var($gender, FILTER_SANITIZE_STRING);
-//   $statusaccount = filter_var($status, FILTER_SANITIZE_STRING);
-
-//   // Set the db object and call the insert method and pass all the variable that declared in the insert method in model
-//   // , $address, $gender
-//   $db->insertAccDetails($accId, $userAddress, $userGender);
-//   $db->insertAcc($name, $statusaccount);
-  
-//   // echo $lname;
-//   // print_r($check);  
-//   // // var_dump($check);
-//   // exit();
-//   // header("Location:../index.php");
-// }
 
 
 
@@ -74,28 +40,28 @@ function test_input($data) {
   <div class="input-section">
     <div class="container-input">
       <!-- ./controller/ph_address.php -->
-    <form action="" method="" name="valForm" id="valForm">
+    <form action="" method="POST" name="form-data" id="form-data">
       <div class="mb-3">
         <label for="" class="form-label">Lastname <span class="limitation">(Only letters, period and space are allowed)</span></label>
-        <input type="text" name="lastname" id="lastname" class="form-control" maxlength="32" onInput="getLname()"> 
+        <input type="text" name="lname" id="lastname" class="form-control" maxlength="32" onInput="getLname()" required> 
         <span id="resultLname"></span>
         <!-- pattern="^[^~!$%^?]$" title="Only the letters, period and space are allowed." -->
       </div>
       <div class="mb-3">
         <label for="" class="form-label">Firstname <span class="limitation">(Only letters, period and space are allowed)</span></label>
-        <input type="text" name="firstname"  id="firstname" class="form-control" maxlength="32" onInput="getFname()">
+        <input type="text" name="fname"  id="firstname" class="form-control" maxlength="32" onInput="getFname()" required>
         <span id="resultFname"></span>
         <!-- pattern=^[^~!$%^?]$" title="Only the letters, period and space are allowed." -->
       </div>
       <p class="fs-5 text-bold">Address</p>
 
       <input type="hidden" name="accId" value="1">
-      <input type="hidden" name="fullAddress">
       <input type="hidden" name="status" value="online">
 
       <label for="island">Island</label>
       <span id="resultIsland"></span>
-      <select id="island" name="island" class="reset form-select mb-3">
+      <select id="island" name="slnd" class="reset form-select mb-3">
+        <!-- value="<?php echo $island['island_name'] ?>" -->
         <option value="" selected disabled>Select an island...</option>
 
         <!-- Fetching island from database using while loop -->
@@ -118,21 +84,21 @@ function test_input($data) {
 
       <label for="region">Region</label>
       <span id="resultRegion"></span>
-      <select class="reset form-select mb-3" name="region" id="region" placeholder="Select region...">
+      <select class="reset form-select mb-3" name="rgn" id="region" placeholder="Select region...">
         <option disabled>Select region...</option>
       </select>
       
 
       <label for="province">Province</label>
       <span id="resultProvince"></span>
-      <select class="reset province form-select mb-3" name="province" id="province">
+      <select class="reset province form-select mb-3" name="prvnc" id="province">
         <option disabled>Select province...</option>
       </select>
       
 
       <label for="city">City</label>
       <span id="resultCity"></span>
-      <select class="reset form-select mb-3" name="city" id="city">
+      <select class="reset form-select mb-3" name="ct" id="city">
         <option disabled>Select city...</option>
       </select>
       
@@ -146,14 +112,14 @@ function test_input($data) {
 
       <div class="mb-3">
         <label for="" class="form-label">Bldg/Blk/Lot/Subd</label>
-        <input type="text" onInput="addressInput()" name="address" id="address" pattern="^[a-zA-Z0-9\s,'-]*$" title="!, $, %, ^ are not allowed" class="address form-control">
+        <input type="text" onInput="addressInput()" name="ddrss" id="address" pattern="^[a-zA-Z0-9\s,'-]*$" title="!, $, %, ^ are not allowed" class="address form-control">
         <span id="resultAddress"></span>
         
       </div>
 
       <div class="mb-3">
         <label for="" class="form-label">Gender</label>
-        <select id="gender" name="gender" class="gender form-select" aria-label="Default select example">
+        <select id="gender" name="gndr" class="gender form-select" aria-label="Default select example">
           <option value="">Choose...</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -170,7 +136,7 @@ function test_input($data) {
       </div>
 
       <div class="form-group">
-        <input type="submit" value="Submit" name="info" id="newUser" class="btn btn-success btn-block mb-3 float-end" onclick="displayData()">
+        <input type="submit" value="Submit" name="insert" id="insert" class="btn btn-success btn-block mb-3 float-end" onclick="displayData()">
       </div>
       
       <!-- <button type="submit" name="info" id="newUser" class="btn btn-primary float-end mb-3" onclick="displayData()">Submit</button> -->
@@ -211,22 +177,22 @@ function test_input($data) {
     
 
     // View account information
-    // $(document).ready(function(){
-    //   $("jqTable").jqGrid();
+      // $(document).ready(function(){
+      //   $("jqTable").jqGrid();
 
-    //   function showAllUsers(){
-    //     $.ajax({
-    //       url: "./controller/ph_address.php",
-    //       type: "POST",
-    //       data: {
-    //         action: "view"
-    //       },
-    //       success:function(response){
-    //         console.log(response);
-    //       }
-    //     })
-    //   }
-    // });
+      //   function showAllUsers(){
+      //     $.ajax({
+      //       url: "./controller/ph_address.php",
+      //       type: "POST",
+      //       data: {
+      //         action: "view"
+      //       },
+      //       success:function(response){
+      //         console.log(response);
+      //       }
+      //     })
+      //   }
+      // });
     // View account information
 
 
@@ -509,7 +475,7 @@ function test_input($data) {
           openCheck(dialog);
 
           setTimeout(function() {
-            location.reload();
+            location.reload(true);
           }, 100);
         });
 
@@ -575,8 +541,9 @@ function test_input($data) {
         // ------------------------------------------------------- //
 
         // Form variable to reset
-        var valForm = document.getElementById("valForm");
-        valForm.reset();
+        // location.reload(true);
+        // var valForm = document.getElementById("valForm");
+        // valForm.reset();
 
 
       }
@@ -697,67 +664,41 @@ function test_input($data) {
     // ---------------------------------------------------------- //
 
     // Insert ajax request
-
-    // $(document).ready(function(){
-    $(document).ready(function(){
-      $('form').submit(function(e){
+    $("#insert").click(function(e){
+      if($("#form-data")[0].checkValidity()){
 
         e.preventDefault();
 
-        // Serialized the form data
-        var formData = $(this).serialize();
+        // Island item in select
+        var islandName = $('select[name="slnd"] option:selected').text();
+        // Region item in select
+        var regionName = $('select[name="rgn"] option:selected').text();
+        // Province item in select
+        var provinceName = $('select[name="prvnc"] option:selected').text();
+        // City item in select
+        var cityName = $('select[name="ct"] option:selected').text();
+        // Barangay item in select
+        var barangayName = $('select[name="brgy"] option:selected').text();
 
-        // Get the value of the select element
-        var islandValue = $('#island').val();
+        var data = $("#form-data").serialize()+"&action=insert&islandName=" + islandName + "&regionName=" + regionName + "&provinceName=" + provinceName + "&cityName=" + cityName + "&barangayName=" + barangayName; // serialize - get the data form and turn it into an array
 
-        // Add the select element value to the serialized form data
-        formData += '&island=' + islandValue;
+        // Debugging
+        // console.log(data);
 
-
-        // Submit form using AJAX code
         $.ajax({
-          url: './controller/ph_address.php',
-          method: 'POST',
-          data: formData,
-          // dataType: 'json',
+          url: "./controller/ph_address.php",
+          type: "POST",
+          data: data,
           success: function(response){
             console.log(response);
-          },
-          error: function(error){
-            console.log(error);
           }
-        })
-      })
-    })
+          // error: function(error){
 
-    // $("#newUser").click(function(e){
-    //   // if($("#valForm")[0].checkValidity()){
-      
-    //   if($("form")[0].checkValidity()){
-    //     var data = $("form").serialize() + "&action=insert"; // serialize - get the input values in array
-    //     // var data = $("form").stringify(); // serialize - get the input values in array
-    //     console.log(data + " - Validate error true");
-    //     // var dataForms = $(this).val();
-    //     e.preventDefault();
-    //     $.ajax({
-    //       type: "POST",
-    //       url: "./controller/ph_address.php",
-    //       data: {
-    //         data
-    //       }, 
-    //       // dataType: "json",
-    //       success:function(response){
-    //         console.log("Success:" + response);
-    //       },
-    //       error: function(xhr, status, error){
-    //         console.log("Error:" + error);
-    //         console.log(xhr);
-    //         alert("ooops");
-    //       }
-           
-    //     });
-    //   }
-    // });
+          // }
+        })
+      }
+
+    })
     // Insert ajax request
 
 

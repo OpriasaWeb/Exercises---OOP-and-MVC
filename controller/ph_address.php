@@ -124,63 +124,46 @@ if(isset($_POST['city_id'])){
 
 // ---------------------------------------------------
 
+if(isset($_POST['action']) && $_POST['action'] == "insert"){
+
+  $lname = $_POST['lname'];
+  $fname = $_POST['fname'];
+  $fullname = $fname . " " . $lname;
+  $stat = $_POST['status'];
+
+  $island = $_POST['islandName'];
+  $region = $_POST['regionName'];
+  $province = $_POST['provinceName'];
+  $city = $_POST['cityName'];
+  $barangay = $_POST['barangayName'];
+  $address = $_POST['ddrss'];
+
+  $full_address = $address . ", " . $barangay . ", " . $city . ", " . $province . ", " . $region . ", " . $island;
+
+  $id = $_POST['accId'];
+
+  $gender = $_POST['gndr'];
+
+  $checkInsert = $db->insertAcc($fullname, $stat);
+  $checkAddress = $db->insertAccDetails($id, $full_address, $gender);
+
+  if($checkInsert && $checkAddress){
+    echo "
+      <script>console.log('Inserted successfully.')</script>
+    ";
+  } else{
+    echo "
+      <script>console.log('Inserting data failed.')</script>
+    ";
+  }
+}
+
 // Insert data to account information database
 //  && $_POST['action'] == 'insert'
 // if($_SERVER['REQUEST_METHOD'] == 'POST'){
 // if(isset($_POST['action']) && $_POST['action'] == "insert"){
 
   // Do the get try get the get the data thru get lol
-
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  // It sanitize data from html input with htmlspecialchars
-// if(isset($_POST["form_data"])){
-  $lname = $_POST['lastname'];
-  $fname = $_POST['firstname'];
-
-  $island = $_POST['island'];
-  $region = $_POST['region'];
-  $province = $_POST['province'];
-  $city = $_POST['city'];
-  $barangay = $_POST['brgy'];
-
-  $name = htmlspecialchars($fname . " " . $lname);
-  $status = $_POST['status'];
-
-  $accId = $_POST['accId'];
-  $address = htmlspecialchars($island . ", " . $region . ", " . $province . ", " . $city . ", " . $barangay);
-  $gender = $_POST['gender'];
-  
-
-  // Sanitize the data before inserting it into the database
-
-  $userAddress = filter_var($address, FILTER_SANITIZE_STRING);
-  $userGender = filter_var($gender, FILTER_SANITIZE_STRING);
-  $statusaccount = filter_var($status, FILTER_SANITIZE_STRING);
-
-  // Set the db object and call the insert method and pass all the variable that declared in the insert method in model
-  // , $address, $gender
-  // $db->insertAccDetails($accId, $userAddress, $userGender);
-  $checkData = $db->insertAcc($name, $statusaccount);
-  // echo $checkData;
-  // return $checkData;
-
-  if($checkData){
-    echo "Data inserted successfully!";
-  } else{
-    echo "Error inserting data";
-  }
-
-  
-  // echo $lname;
-  // print_r($check);  
-  // // var_dump($check);
-  // exit();
-  // header("Location:../index.php");
-}
-
-
-
-
 
 
 // if(isset($_POST['action']) && $_POST['action'] == 'insert'){

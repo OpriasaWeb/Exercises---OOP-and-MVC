@@ -29,9 +29,9 @@
   <link rel="stylesheet" href="./public/styles.css">
 
   <!-- jqGrid -->
-  <!-- <script src="./jquery.jqGrid-4.4.3/js/jquery-1.7.2.min.js"></script>
+  <script src="./jquery.jqGrid-4.4.3/js/jquery-1.7.2.min.js"></script>
   <script src="./jquery.jqGrid-4.4.3/js/jquery.jqGrid.min.js"></script>
-  <script src="./jquery.jqGrid-4.4.3/js/jquery.jqGrid.src.js"></script> -->
+  <script src="./jquery.jqGrid-4.4.3/js/jquery.jqGrid.src.js"></script>
 
   <!-- <link rel="stylesheet" type="text/css" href="css/ui.jqgrid.css"> -->
   <!-- <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
