@@ -1,0 +1,937 @@
+<!-- View -->
+
+<?php
+session_start();
+
+// Include database connection
+require_once('./model/db.php');
+// require_once('./controller/ph_address.php');
+
+$db = new Database();
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+
+// if($_SERVER['REQUEST_METHOD'] == 'POST'){
+//   // It sanitize data from html input with htmlspecialchars
+//   $lname = $_POST['lastname'];
+//   $fname = $_POST['firstname'];
+
+//   // $island = $_POST['island'];
+//   $region = $_POST['region'];
+//   $province = $_POST['province'];
+//   $city = $_POST['city'];
+//   $barangay = $_POST['brgy'];
+
+//   $name = $fname . " " . $lname;
+//   $status = $_POST['status'];
+
+//   $accId = $_POST['accId'];
+//   $address = $island . ", " . $region . ", " . $province . ", " . $city . ", " . $barangay;
+//   $gender = $_POST['gender'];
+  
+
+//   // Sanitize the data before inserting it into the database
+
+//   $userAddress = filter_var($address, FILTER_SANITIZE_STRING);
+//   $userGender = filter_var($gender, FILTER_SANITIZE_STRING);
+//   $statusaccount = filter_var($status, FILTER_SANITIZE_STRING);
+
+//   // Set the db object and call the insert method and pass all the variable that declared in the insert method in model
+//   // , $address, $gender
+//   $db->insertAccDetails($accId, $userAddress, $userGender);
+//   $db->insertAcc($name, $statusaccount);
+  
+//   // echo $lname;
+//   // print_r($check);  
+//   // // var_dump($check);
+//   // exit();
+//   // header("Location:../index.php");
+// }
+
+
+
+?>
+
+
+<!-- Include header -->
+<?php
+  include 'includes/header.php'
+?>
+
+<body>
+  <div class="container">
+    <div class="m-5">
+    <p class="fs-4">PhilWeb exercises</p>
+    <a href="./info.php" class="btn btn-success float-end">View info</a>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="container-input">
+      <!-- ./controller/ph_address.php -->
+    <form action="" method="" name="valForm" id="valForm">
+      <div class="mb-3">
+        <label for="" class="form-label">Lastname <span class="limitation">(Only letters, period and space are allowed)</span></label>
+        <input type="text" name="lastname" id="lastname" class="form-control" maxlength="32" onInput="getLname()"> 
+        <span id="resultLname"></span>
+        <!-- pattern="^[^~!$%^?]$" title="Only the letters, period and space are allowed." -->
+      </div>
+      <div class="mb-3">
+        <label for="" class="form-label">Firstname <span class="limitation">(Only letters, period and space are allowed)</span></label>
+        <input type="text" name="firstname"  id="firstname" class="form-control" maxlength="32" onInput="getFname()">
+        <span id="resultFname"></span>
+        <!-- pattern=^[^~!$%^?]$" title="Only the letters, period and space are allowed." -->
+      </div>
+      <p class="fs-5 text-bold">Address</p>
+
+      <input type="hidden" name="accId" value="1">
+      <input type="hidden" name="fullAddress">
+      <input type="hidden" name="status" value="online">
+
+      <label for="island">Island</label>
+      <span id="resultIsland"></span>
+      <select id="island" name="island" class="reset form-select mb-3">
+        <option value="" selected disabled>Select an island...</option>
+
+        <!-- Fetching island from database using while loop -->
+        <?php
+          // fetching island data from db
+          // $statement = $db->getIsland();
+          $statement = $pdo->query("SELECT * FROM island");
+          while($island = $statement->fetch(PDO::FETCH_ASSOC)){
+        ?>
+          <option value="<?php echo $island['island_id'] ?>"><?php echo $island['island_name'] ?></option>
+        <?php
+          } 
+        ?>
+          
+        
+        <!-- Fetching island from database using while loop -->
+        
+      </select>
+      
+
+      <label for="region">Region</label>
+      <span id="resultRegion"></span>
+      <select class="reset form-select mb-3" name="region" id="region" placeholder="Select region...">
+        <option disabled>Select region...</option>
+      </select>
+      
+
+      <label for="province">Province</label>
+      <span id="resultProvince"></span>
+      <select class="reset province form-select mb-3" name="province" id="province">
+        <option disabled>Select province...</option>
+      </select>
+      
+
+      <label for="city">City</label>
+      <span id="resultCity"></span>
+      <select class="reset form-select mb-3" name="city" id="city">
+        <option disabled>Select city...</option>
+      </select>
+      
+
+      <label for="barangay">Barangay</label>
+      <span id="resultBarangay"></span>
+      <select class="reset form-select mb-3" name="brgy" id="barangay">
+        <option disabled>Select barangay...</option>
+      </select>
+      
+
+      <div class="mb-3">
+        <label for="" class="form-label">Bldg/Blk/Lot/Subd</label>
+        <input type="text" onInput="addressInput()" name="address" id="address" pattern="^[a-zA-Z0-9\s,'-]*$" title="!, $, %, ^ are not allowed" class="address form-control">
+        <span id="resultAddress"></span>
+        
+      </div>
+
+      <div class="mb-3">
+        <label for="" class="form-label">Gender</label>
+        <select id="gender" name="gender" class="gender form-select" aria-label="Default select example">
+          <option value="">Choose...</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        <!-- <option value="No">I'd rather not to say</option> -->
+        </select>
+        <span id="resultGender"></span>
+        
+      </div>
+
+      <div class="mb-3">
+        <label>Birthdate <span class="limitation">(21 above are allowed)</span></label>
+        <input type="text" name="birthdate" id="datepicker" class="birthdate form-control" placeholder="Date..">
+        <span id="resultBirthdate"></span>
+      </div>
+
+      <div class="form-group">
+        <input type="submit" value="Submit" name="info" id="newUser" class="btn btn-success btn-block mb-3 float-end" onclick="displayData()">
+      </div>
+      
+      <!-- <button type="submit" name="info" id="newUser" class="btn btn-primary float-end mb-3" onclick="displayData()">Submit</button> -->
+      <!-- <button type="submit" name="info" id="newUser" class="btn btn-primary float-end mb-3" onclick="displayData()">Submit</button> -->
+
+      
+    </form>
+    </div>
+  </div>
+
+  <!-- Last modal please -->
+  <!-- Simple pop-up dialog box, containing a form -->
+  <dialog id="favDialog">
+    <form method="dialog">
+      <button id="close" class="float-end" aria-label="close" formnovalidate>&times;</button>
+      <section>
+        <p class="fs-4">View info</p>
+        <div class="viewInfo" id="viewInfo">
+        
+        </div>
+      </section>
+    </form>
+  </dialog>
+  <!-- Last modal please -->
+
+
+  <!-- --------------------------------------------------------------------------- -->
+
+  <!-- Footer -->
+  <?php
+    include 'includes/footer.php'
+  ?>
+  <!-- Footer -->
+
+  <!-- Date picker -->
+  <script type="text/javascript">
+
+    
+
+    // View account information
+    // $(document).ready(function(){
+    //   $("jqTable").jqGrid();
+
+    //   function showAllUsers(){
+    //     $.ajax({
+    //       url: "./controller/ph_address.php",
+    //       type: "POST",
+    //       data: {
+    //         action: "view"
+    //       },
+    //       success:function(response){
+    //         console.log(response);
+    //       }
+    //     })
+    //   }
+    // });
+    // View account information
+
+
+    // Prevent the bad input in names
+    function getLname(){
+      let lname = document.getElementById("lastname");
+      let lnameValue = lname.value;
+
+      let result = document.getElementById("resultLname");
+      // result.innerText = lnameValue;
+      
+      // create a regular expression to match against the user input
+      var regex = /^[a-zA-Z.\s*]*$/;
+
+      // regex for empty input by user
+      var emptyInput = /\s*/;
+
+      if(lnameValue == ""){
+        result.style.color = 'red';
+        result.innerText = "* required";
+      }
+
+      if(!regex.test(lnameValue)){
+        lname.style.fontWeight = 'bold';
+        lname.style.color = 'red';
+        result.style.color = 'red';
+        result.innerText = "Ooops. Invalid input.";
+      } else{
+        lname.style.fontWeight = 'normal';
+        lname.style.color = 'black';
+        result.style.fontWeight = 'bold';
+        result.style.color = 'green';
+        result.innerText = "Valid input.";
+      }
+    }
+
+    function getFname(){
+      let fname = document.getElementById("firstname");
+      let fnameValue = fname.value;
+
+      let resultFname = document.getElementById("resultFname");
+      // result.innerText = lnameValue;
+      
+      // create a regular expression to match against the user input
+      var regexfName = /^[a-zA-Z.\s]*$/;
+
+      if(!regexfName.test(fnameValue)){
+        fname.style.fontWeight = 'bold';
+        fname.style.color = 'red';
+        resultFname.style.color = 'red';
+        resultFname.innerText = "Ooops. Invalid input.";
+      } else{
+        fname.style.fontWeight = 'normal';
+        fname.style.color = 'black';
+        resultFname.style.fontWeight = 'bold';
+        resultFname.style.color = 'green';
+        resultFname.innerText = "Valid input.";
+      }
+    }
+    // Prevent the bad input in names
+
+    // Prevent bad input of address
+    function addressInput(){
+      let inputAddress = document.getElementById("address");
+      let addressValue = inputAddress.value;
+
+      let resultAddress = document.getElementById("resultAddress");
+      // result.innerText = lnameValue;
+      
+      // regex for address
+      var addressRegex = /^[a-zA-Z0-9\s,'-.]*$/;
+
+      if(!addressRegex.test(addressValue)){
+        inputAddress.style.fontWeight = 'bold';
+        inputAddress.style.color = 'red';
+        resultAddress.style.color = 'red';
+        resultAddress.innerText = "Ooops. Invalid input.";
+      } else{
+        inputAddress.style.fontWeight = 'normal';
+        inputAddress.style.color = 'black';
+        resultAddress.style.fontWeight = 'bold';
+        resultAddress.style.color = 'green';
+        resultAddress.innerText = "Valid input.";
+      }
+    }
+    // Prevent bad input of address
+
+    // ---------------------------------------------------------- //
+
+    // Form button display data
+    function displayData(){
+
+      // Regex pop error message condition
+      // Regex for address
+      var addressRegex = /^[a-zA-Z0-9\s,'-.]*$/;
+
+      // Address
+      var inputAddress = document.getElementById("address");
+      var addressValue = inputAddress.value;
+
+
+      // Regex for lastname and firstname 
+      var regex = /^[a-zA-Z.\s]*$/;
+
+      // Lastname
+      var lname = document.getElementById("lastname");
+      var lnameValue = lname.value;
+
+      // Firstname
+      var fname = document.getElementById("firstname");
+      var fnameValue = fname.value;
+
+      // Island
+      var island = document.getElementById("island");
+      var islandValue = island.value;
+
+      // Region
+      var region = document.getElementById("region");
+      var regionValue = region.value;
+
+      // Province
+      var province = document.getElementById("province");
+      var provinceValue = province.value;
+
+      // City
+      var city = document.getElementById("city");
+      var cityValue = city.value;
+
+      // Barangay
+      var barangay = document.getElementById("barangay");
+      var barangayValue = barangay.value;
+
+      // Gender
+      var gender = document.getElementById("gender");
+      var genderValue = gender.value;
+
+      // Birthdate
+      var birthdate = document.getElementById("datepicker");
+      var birthdateValue = birthdate.value;
+
+      // Required message span id
+      let resultLname = document.getElementById("resultLname");
+      let resultFname = document.getElementById("resultFname");
+      let resultAddress = document.getElementById("resultAddress");
+      let resultIsland = document.getElementById("resultIsland");
+      let resultRegion = document.getElementById("resultRegion");
+      let resultProvince = document.getElementById("resultProvince");
+      let resultCity = document.getElementById("resultCity");
+      let resultBarangay = document.getElementById("resultBarangay");
+      let resultGender = document.getElementById("resultGender");
+      let resultBirthdate = document.getElementById("resultBirthdate");
+      // Required message span id
+
+      // If island left no value
+      if(islandValue == ""){
+        resultIsland.style.fontWeight = 'bold';
+        resultIsland.style.color = 'red';
+        resultIsland.innerText = "* required";
+        // If any of these if empty
+        alert("Island should not be empty.");
+        return;
+        // if(!islandValue == ""){
+        //   resultIsland.innerText = "";
+        // }
+        // return;
+      }
+      // If region left no value
+      else if(regionValue == ""){
+        resultRegion.style.fontWeight = 'bold';
+        resultRegion.style.color = 'red';
+        resultRegion.innerText = "* required";
+        // If any of these if empty
+        alert("Region should not be empty.");
+        return;
+      }
+      // If province left no value
+      else if(provinceValue == ""){
+        resultProvince.style.fontWeight = 'bold';
+        resultProvince.style.color = 'red';
+        resultProvince.innerText = "* required";
+        // If any of these if empty
+        alert("Province should not be empty.");
+        return;
+      }
+      // If city left no value
+      else if(cityValue == ""){
+        resultCity.style.fontWeight = 'bold';
+        resultCity.style.color = 'red';
+        resultCity.innerText = "* required";
+        // If any of these if empty
+        alert("City should not be empty.");
+        return;
+      }
+      // If barangay left no value
+      else if(barangayValue == ""){
+        resultBarangay.style.fontWeight = 'bold';
+        resultBarangay.style.color = 'red';
+        resultBarangay.innerText = "* required";
+        // If any of these if empty
+        alert("Barangay should not be empty.");
+        return;
+      }
+      // If gender left no value
+      else if(genderValue == ""){
+        resultGender.style.fontWeight = 'bold';
+        resultGender.style.color = 'red';
+        resultGender.innerText = "* required";
+        // If any of these if empty
+        alert("Gender is required.");
+        return;
+      }
+      // If birthdate left no value
+      else if(birthdateValue == ""){
+        resultBirthdate.style.fontWeight = 'bold';
+        resultBirthdate.style.color = 'red';
+        resultBirthdate.innerText = "* required";
+        // If any of these if empty
+        alert("Birthdate should not be empty.");
+        return;
+      }
+      // If lastname left no value
+      else if(lnameValue == ""){
+        resultLname.style.fontWeight = 'bold';
+        resultLname.style.color = 'red';
+        resultLname.innerText = "* required";
+        // If any of these if empty
+        alert("Last name should not be empty.");
+        return;
+      } 
+      // If firstname left no value
+      else if(fnameValue == ""){
+        resultFname.style.fontWeight = 'bold';
+        resultFname.style.color = 'red';
+        resultFname.innerText = "* required";
+        alert("First name should not be empty.");
+        return;
+      } 
+      // If address left no value
+      else if(addressValue == ""){
+        resultAddress.style.fontWeight = 'bold';
+        resultAddress.style.color = 'red';
+        resultAddress.innerText = "* required";
+        alert("Address should not be empty.");
+        return;
+      } 
+      else if(!regex.test(lnameValue) || !regex.test(fnameValue) || !addressRegex.test(addressValue)){
+        // if any of these is false
+        alert("Kindly recheck the lastname, firstname or address if valid input.");
+        return;
+      }
+      // If no error, show the popup created user
+      else{
+        // Inputs variable
+
+        // ------------------------------------------------------- //
+
+        // Dialog pop
+
+
+        const closeButton = document.getElementById("close");
+        const dialog = document.getElementById("favDialog");
+
+        // Debugging if working correctly
+        function openCheck(dialog) {
+          if (dialog.open) {
+            console.log("Dialog open");
+          } else {
+            console.log("Dialog closed");
+          }
+        }
+
+        // Show the light box containing the data inputted by the user
+        dialog.showModal();
+        openCheck(dialog);
+
+      
+        // Form close button closes the dialog box
+        closeButton.addEventListener("click", () => {
+          dialog.close();
+          openCheck(dialog);
+
+          setTimeout(function() {
+            location.reload();
+          }, 100);
+        });
+
+        // Dialog pop
+
+        // ------------------------------------------------------- //
+        
+        // Content of the input data from the user
+        var lname = document.getElementById("lastname").value;
+        var fname = document.getElementById("firstname").value;
+        var islnd = document.getElementById("island").value;
+        var rgn = document.getElementById("region").value;
+
+        // Get the province text content
+        var prvnc = document.getElementById("province");
+        var prvncOption = prvnc.options[prvnc.selectedIndex];
+        var prvncSelected = prvncOption.textContent;
+        // Get the province text content
+
+        // Get the city text content
+        var ct = document.getElementById("city");
+        var ctOption = ct.options[ct.selectedIndex];
+        var ctSelected = ctOption.textContent;
+        // Get the city text content
+        
+        // Get the barangay text content
+        var brgy = document.getElementById("barangay");
+        var brgyOption = brgy.options[brgy.selectedIndex];
+        var brgySelected = brgyOption.textContent;
+        // Get the barangay text content
+
+        var addrss = document.getElementById("address").value;
+        var gndr = document.getElementById("gender").value;
+        var birthdate = document.getElementById("datepicker").value;
+
+        // To be display
+        var nameOfUser = "Fullname: " + fname + " " + lname;
+        var userAddress = "Address: " + addrss + ", " + brgySelected + ", " + ctSelected + ", " + prvncSelected;
+        var genderUser = "Gender: " + gndr;
+        // To be display
+
+        // Create div to include the info
+        const nameDiv = document.createElement("p");
+        const addressDiv = document.createElement("p");
+        const genderDiv = document.createElement("p");
+        // const dialogPop = document.createElement("dialog");
+
+        // Put the context of the string to the newly created div
+        nameDiv.textContent = nameOfUser;
+        addressDiv.textContent = userAddress;
+        genderDiv.textContent = genderUser;
+
+        // Display modal variable text content
+        var viewInfo = document.getElementById("viewInfo");
+
+        viewInfo.appendChild(nameDiv);
+        viewInfo.appendChild(addressDiv);
+        viewInfo.appendChild(genderDiv);
+
+        // alert("Created user successfully!");
+        // Content of the input data from the user
+
+        // ------------------------------------------------------- //
+
+        // Form variable to reset
+        var valForm = document.getElementById("valForm");
+        valForm.reset();
+
+
+      }
+    }
+    // Form button display data
+
+    // ---------------------------------------------------------- //
+
+    // Date picker
+    $(function(){
+      var ageAllowed = new Date('2002-12-31'); // set the start date where the age bracket is allowed, 21 years old up.
+      $("#datepicker").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: 'c-150:c', // year range from the current date going down to 150 numbers of years
+        maxDate: ageAllowed // set to current date using JS object date
+      });
+    });
+    // Date picker
+
+    // ---------------------------------------------------------- //
+
+    // Island
+    $(document).ready(function(){
+      // Region
+      $("#island").change(function(){
+
+        var islandId = $(this).val();
+
+        $.ajax({
+          url: "./controller/ph_address.php",
+          method: 'POST',
+          data:{
+            island_id: islandId
+          },
+          success:function(data){
+            $("#region").html(data);
+          }
+        });
+      });
+
+      // Province
+      $("#region").change(function(){
+        // var islandId = $("#island").val();
+        var regionId = $(this).val();
+        $.ajax({
+          url: "./controller/ph_address.php",
+          method: 'POST',
+          data:{
+            region_id: regionId
+          },
+          success:function(data){
+            $("#province").html(data);
+          }
+        });
+      });
+
+      // City
+      $("#province").change(function(){
+        var provinceId = $(this).val();
+        $.ajax({
+          url: "./controller/ph_address.php",
+          method: 'POST',
+          data:{
+            province_id: provinceId
+          },
+          success:function(data){
+            $("#city").html(data);
+          }
+        });
+      });
+
+      // Barangay
+      $("#city").change(function(){
+        var cityId = $(this).val();
+        $.ajax({
+          url: "./controller/ph_address.php",
+          method: 'POST',
+          data:{
+            city_id: cityId
+          },
+          success:function(data){
+            $("#barangay").html(data);
+          }
+        });
+      });
+
+    });
+
+    // ---------------------------------------------------------- //
+
+    // Reset click
+
+    // Reset click island
+    $("#island").change(function(){
+      if($(this)){
+        $(".reset").slice(1, 5).find("option").prop("selected", false);
+      // console.log(this);
+      }
+    });
+
+    // // Reset click region
+    $("#region").change(function(){
+      if($(this)){
+        $(".reset").slice(2, 5).find("option").prop("selected", false);
+      }
+    });
+
+    // // Reset click province
+    $("#province").change(function(){
+      if($(this)){
+        $(".reset").slice(3, 5).find("option").prop("selected", false);
+      }
+    });
+    
+    // Reset click
+
+    // ---------------------------------------------------------- //
+
+    // Insert ajax request
+
+    // $(document).ready(function(){
+    $(document).ready(function(){
+      $('form').submit(function(e){
+
+        e.preventDefault();
+
+        // Serialized the form data
+        var formData = $(this).serialize();
+
+        // Get the value of the select element
+        var islandValue = $('#island').val();
+
+        // Add the select element value to the serialized form data
+        formData += '&island=' + islandValue;
+
+
+        // Submit form using AJAX code
+        $.ajax({
+          url: './controller/ph_address.php',
+          method: 'POST',
+          data: formData,
+          // dataType: 'json',
+          success: function(response){
+            console.log(response);
+          },
+          error: function(error){
+            console.log(error);
+          }
+        })
+      })
+    })
+
+    // $("#newUser").click(function(e){
+    //   // if($("#valForm")[0].checkValidity()){
+      
+    //   if($("form")[0].checkValidity()){
+    //     var data = $("form").serialize() + "&action=insert"; // serialize - get the input values in array
+    //     // var data = $("form").stringify(); // serialize - get the input values in array
+    //     console.log(data + " - Validate error true");
+    //     // var dataForms = $(this).val();
+    //     e.preventDefault();
+    //     $.ajax({
+    //       type: "POST",
+    //       url: "./controller/ph_address.php",
+    //       data: {
+    //         data
+    //       }, 
+    //       // dataType: "json",
+    //       success:function(response){
+    //         console.log("Success:" + response);
+    //       },
+    //       error: function(xhr, status, error){
+    //         console.log("Error:" + error);
+    //         console.log(xhr);
+    //         alert("ooops");
+    //       }
+           
+    //     });
+    //   }
+    // });
+    // Insert ajax request
+
+
+    // For later codes
+
+
+      // const showButton = document.getElementById('showDialog');
+      // const favDialog = document.getElementById('favDialog');
+      // const outputBox = document.querySelector('output');
+      // const selectEl = favDialog.querySelector('select');
+      // const confirmBtn = favDialog.querySelector('#confirmBtn');
+
+      // // "Show the dialog" button opens the <dialog> modally
+      // showButton.addEventListener("click", () => {
+      //     favDialog.showModal();
+      // });
+
+      // // "Favorite animal" input sets the value of the submit button
+      // selectEl.addEventListener('change', (e) => {
+      //   confirmBtn.value = selectEl.value;
+      // });
+
+      // // "Confirm" button of form triggers "close" on dialog because of [method="dialog"]
+      // favDialog.addEventListener('close', () => {
+      //   outputBox.value = `ReturnValue: ${favDialog.returnValue}.`;
+      // });
+
+      // if(isset($_POST['info'])){
+
+
+      // // Set variable for last and first name
+      // $lastname_reg = test_input($_POST['lastname']);
+      // $firstname_reg = test_input($_POST['firstname']);
+
+      // // regex to disable the input besides letters, period and space
+      // $exactReg = '/^[\w .,!?()]+$/';
+
+      // $last_reg = preg_match($exactReg, $lastname_reg);
+      // $first_reg = preg_match($exactReg, $firstname_reg);
+
+      // // For last and first name
+      // if($last_reg == 1 || $first_reg == 1){
+      //   // if so, return the forbidden things due to validation
+
+
+        // }
+
+      // // Regex restricting the invalid input in address form
+      // // /[\x{7F}-\xFF~!$%^]+/
+      // $address_input = test_input($_POST['address']);
+      // $address_reg = '/[\x{7F}-\xFF~!$%^]+/';
+
+      // if(preg_match($address_reg, $address_input)){
+      //   // if restricted input, display live error
+      //   // echo "alert('You enter a restrict input in address')";
+
+      // } else if($address_input == ""){
+
+      // } else{
+
+      // }
+
+      // }
+      //   // Inputs variable
+        //   var lname = document.getElementById("lastname").value;
+        //   var fname = document.getElementById("firstname").value;
+        //   var islnd = document.getElementById("island").value;
+        //   var rgn = document.getElementById("region").value;
+        //   var prvnc = document.getElementById("province").value;
+        //   var ct = document.getElementById("city").value;
+        //   var brgy = document.getElementById("barangay").value;
+        //   var addrss = document.getElementById("address").value;
+        //   var gndr = document.getElementById("gender").value;
+        //   var birthdate = document.getElementById("datepicker").value;
+
+        //   // To be display
+        //   var nameOfUser = "Fullname: " + fname + " " + lname;
+        //   var userAddress = "Address: " + addrss + ", " + brgy + ", " + ct + ", " + prvnc;
+        //   var genderUser = "Gender: " + gndr;
+
+        //   // Create div to incude the info
+        //   const nameDiv = document.getElementById("fullname");
+        //   const addressDiv = document.getElementById("addrss");
+        //   const genderDiv = document.getElementById("gndr");
+
+        //   // Put the context of the string to the newly created div
+        //   nameDiv.textContent = nameOfUser;
+        //   addressDiv.textContent = userAddress;
+        //   genderDiv.textContent = genderUser;
+
+        //   // document.body.write(getDiv);
+        //   document.body.appendChild(nameDiv);
+        //   document.body.appendChild(addressDiv);
+        //   document.body.appendChild(genderDiv);
+
+        //   // Form variable to reset
+        //   var valForm = document.getElementById("valForm");
+        //   valForm.reset();
+
+        // }
+
+      // if any of these is false, pop the error modal message
+
+
+
+      // Ajax show error
+          // attach a listener to the form submit event
+            // $('#valForm').submit(function(event) {
+            //   event.preventDefault(); // prevent form from submitting normally
+              
+            //   // get the user input from the form
+            //   var userLastname = $('input[name="lastname"]').val();
+              
+            //   // create a regular expression to match against the user input
+            //   var regex = /^[a-zA-Z.\s]*$/;
+              
+            //   // Validation form for last and first name
+            //   if (!regex.test(userLastname)) {
+            //     // if the validation fails, display an error message
+            //     $('#error-message').text('Input does not match expected format!').show();
+            //   } else {
+            //     // if the validation succeeds, submit the form via AJAX
+            //     $.ajax({
+            //       type: 'POST',
+            //       url: 'ph_address.php',
+            //       data: $(this).serialize(),
+            //       success: function(response) {
+            //         // handle the server's response
+            //         alert('Form submitted successfully!');
+            //       }
+            //     });
+            //   }
+            // });
+
+            // Validation form for last and first name
+            // var pattern = /^[a-zA-Z.\s]*$/; // regular expression to allow only letters, period, and space
+
+            // attach a listener to the input event of the user input field
+            // $('input[name="lastname"]').on('input', function() {
+            //   // get the user input from the input field
+            //   var userInput = $(this).val();
+              
+            //   // create a regular expression to match against the user input
+            //   var regex = /^[a-zA-Z0-9\s,'-.]*$/;
+
+            //   function AlertSubject()
+            //   {
+            //     if (textboxSubject.getText=="")
+            //       alert("Please define subject");
+            //   }
+              
+            //   // validate the user input against the regular expression
+            //   if (!regex.test(userInput)) {
+            //     // if the validation fails, change the text color to red
+            //     $(this).css('color', 'red');
+            //   } else {
+            //     // if the validation succeeds, change the text color to black
+            //     $(this).css('color', 'black');
+            //   }
+            // });
+          //
+            // Prevent empty input - prevent default
+        // btn.onclick = (event) => {
+        //   event.preventDefault();
+        //   alert(sb.value);
+        // };
+      // Prevent empty input - prevent default
+
+
+    // For later codes
+
+
+  </script>
+  
+</body>
+</html>
+<!-- View -->
