@@ -7,13 +7,13 @@
 // require_once('../controller/ph_address.php');  
 
 // PDO
-$pdo = new PDO('mysql:host=localhost;dbname=address', 'root', '@raym33B3m14');
+$pdo = new PDO('mysql:host=localhost;dbname=address', 'root', '');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 class Database{
   private $dsn = "mysql:host=localhost;dbname=address";
   private $user = "root";
-  private $pass = "@raym33B3m14";
+  private $pass = "";
   public $conn;
 
 
